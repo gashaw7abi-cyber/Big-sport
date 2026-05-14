@@ -15,16 +15,18 @@ async function startServer() {
       let allArticles: any[] = [];
       
       await Promise.all(leagues.map(async (league) => {
-        try {
-          const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/news`);
-          if (response.ok) {
-            const data = await response.json();
-            if (data.articles) {
-              allArticles.push(...data.articles);
+        for (let page = 1; page <= 3; page++) {
+          try {
+            const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/news?limit=50&page=${page}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data.articles && data.articles.length > 0) {
+                allArticles.push(...data.articles);
+              }
             }
+          } catch (e) {
+             // ignore error for single league
           }
-        } catch (e) {
-           // ignore error for single league
         }
       }));
       

@@ -506,10 +506,10 @@ function App() {
         <div className="px-5 py-4 max-w-md mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full overflow-hidden shadow-lg shadow-emerald-500/20 bg-emerald-500">
-              <img src="https://i.postimg.cc/0NfqSRLf/file-000000000aec722fb5b892df5f08e6aa.png" alt="BIG SPORTS Logo" className="w-full h-full object-cover" />
+              <img src="https://i.postimg.cc/g29Gpg7r/1778746810882.jpg" alt="NEW SPORT Logo" className="w-full h-full object-cover" />
             </div>
             <div>
-              <h1 className="text-xl font-black italic tracking-wider text-white leading-tight">BIG SPORTS</h1>
+              <h1 className="text-xl font-black italic tracking-wider text-white leading-tight">NEW SPORT</h1>
               <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Live Updates & News</p>
             </div>
           </div>
