@@ -21,6 +21,18 @@
         window.addEventListener('load', () => {
           navigator.serviceWorker.register('/sw.js').then((registration) => {
             console.log('SW registered: ', registration);
+            if ('periodicSync' in registration) {
+              navigator.permissions.query({
+                name: 'periodic-background-sync',
+              }).then((status) => {
+                if (status.state === 'granted') {
+                  registration.periodicSync.register('update', {
+                    minInterval: 24 * 60 * 60 * 1000,
+                  }).then(() => console.log('Periodic sync registered'))
+                  .catch((err) => console.log('Periodic sync failed', err));
+                }
+              }).catch(() => {});
+            }
           }).catch((registrationError) => {
             console.log('SW registration failed: ', registrationError);
           });
