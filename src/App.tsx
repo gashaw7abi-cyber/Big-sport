@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2 } from 'lucide-react';
+import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { auth, db, storage, getMessagingInstance } from './firebase';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User, updateProfile } from 'firebase/auth';
 import { collection, query, orderBy, where, getDocs, addDoc, deleteDoc, doc, serverTimestamp, Timestamp, updateDoc, onSnapshot, setDoc } from 'firebase/firestore';
@@ -48,7 +48,7 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile'>('news');
+  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile' | 'socials'>('news');
   const [news, setNews] = useState<any[]>([]);
   const [customNews, setCustomNews] = useState<any[]>([]);
   const [scores, setScores] = useState<any[]>([]);
@@ -878,6 +878,80 @@ function App() {
               </form>
             </div>
           </div>
+        ) : activeTab === 'socials' ? (
+          <div className="space-y-6">
+            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+              <Share2 className="w-5 h-5 text-emerald-400" />
+              Join Our Community
+            </h2>
+            <div className="bg-[#1e293b] p-6 rounded-3xl border border-slate-700/50">
+              <p className="text-slate-400 text-sm mb-6 text-center">Follow us on any social media for updates and news.</p>
+              
+              <div className="flex flex-col gap-3">
+                <a href="https://t.me/newsport5" target="_blank" rel="noreferrer" className="w-full bg-[#2ba6e1] hover:bg-[#229ed9] text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
+                    <Send className="w-6 h-6 text-white ml-[-2px]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">Telegram Channel</span>
+                    <span className="text-white/80 font-medium text-xs">@newsport5</span>
+                  </div>
+                </a>
+                
+                <a href="https://t.me/newsporti_bot" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-slate-700/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-[#2ba6e1]/20 flex items-center justify-center shrink-0">
+                    <Bot className="w-6 h-6 text-[#2ba6e1]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">Telegram Bot</span>
+                    <span className="text-slate-400 font-medium text-xs">@newsporti_bot</span>
+                  </div>
+                </a>
+
+                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#1877F2]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-[#1877F2]/20 flex items-center justify-center shrink-0">
+                    <Facebook className="w-6 h-6 text-[#1877F2]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">Facebook</span>
+                    <span className="text-slate-400 font-medium text-xs">Follow our page</span>
+                  </div>
+                </a>
+
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#E1306C]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-[#E1306C]/20 flex items-center justify-center shrink-0">
+                    <Instagram className="w-6 h-6 text-[#E1306C]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">Instagram</span>
+                    <span className="text-slate-400 font-medium text-xs">Pictures & Reels</span>
+                  </div>
+                </a>
+
+                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#FF0000]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-[#FF0000]/20 flex items-center justify-center shrink-0">
+                    <Youtube className="w-6 h-6 text-[#FF0000]" />
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">YouTube</span>
+                    <span className="text-slate-400 font-medium text-xs">Watch our videos</span>
+                  </div>
+                </a>
+
+                <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-slate-700/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
+                  <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center shrink-0">
+                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.008 4.07H5.078z" />
+                    </svg>
+                  </div>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base">X (Twitter)</span>
+                    <span className="text-slate-400 font-medium text-xs">Follow updates</span>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-4">
@@ -886,6 +960,7 @@ function App() {
                   Live & Recent Matches
                 </h2>
               </div>
+
               <div className="flex gap-1 bg-[#1e293b] p-1 rounded-2xl border border-slate-700/50">
                 {(['all', 'live', 'upcoming', 'completed'] as const).map((f) => (
                   <button
@@ -975,6 +1050,21 @@ function App() {
                 const homeGoals = goals.filter((g: any) => g.team?.id === homeTeam.team?.id);
                 const awayGoals = goals.filter((g: any) => g.team?.id === awayTeam.team?.id);
                 
+                const getLeagueName = (id: string) => {
+                  const map: Record<string, string> = {
+                    'eng.1': 'PREMIER LEAGUE',
+                    'eng.2': 'CHAMPIONSHIP',
+                    'esp.1': 'LALIGA',
+                    'ita.1': 'SERIE A',
+                    'ger.1': 'BUNDESLIGA',
+                    'fra.1': 'LIGUE 1',
+                    'uefa.champions': 'CHAMPIONS LEAGUE',
+                    'uefa.europa': 'EUROPA LEAGUE',
+                    'uefa.europa.conf': 'CONFERENCE LEAGUE'
+                  };
+                  return map[id] || id;
+                };
+
                 return (
                   <div key={i} onClick={toggleExpand} className="bg-[#1e293b] rounded-3xl p-5 border border-slate-700/50 shadow-lg relative overflow-hidden cursor-pointer transition-colors hover:bg-slate-800">
                     {/* Live indicator glow */}
@@ -983,7 +1073,15 @@ function App() {
                     )}
 
                     <div className="flex justify-between items-center mb-6">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(match.date).toLocaleDateString()}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{new Date(match.date).toLocaleDateString()}</span>
+                        {match._league && (
+                          <>
+                            <span className="text-slate-600">•</span>
+                            <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">{getLeagueName(match._league)}</span>
+                          </>
+                        )}
+                      </div>
                       <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full ${isLive ? 'bg-red-500/20 text-red-500 animate-pulse' : 'bg-slate-800 text-emerald-400'}`}>
                         {displayStatus}
                       </span>
@@ -1211,7 +1309,7 @@ function App() {
           <button 
             onClick={() => setActiveTab('news')}
             className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
-              activeTab === 'news' 
+              activeTab === 'news'
                 ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
                 : 'text-slate-400 hover:text-slate-200'
             }`}
@@ -1219,14 +1317,30 @@ function App() {
             <Newspaper className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">News</span>
           </button>
+          
+          {/* Central Socials Button */}
+          <button 
+            onClick={() => setActiveTab('socials')}
+            className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all relative ${
+              activeTab === 'socials'
+                ? 'bg-emerald-400/10 text-emerald-400 shadow-lg border border-emerald-400/30' 
+                : 'text-slate-400 hover:text-emerald-400'
+            }`}
+          >
+            <div className="absolute inset-0 bg-gradient-to-t from-emerald-400/5 to-transparent rounded-2xl pointer-events-none" />
+            <Share2 className="w-6 h-6 z-10" />
+            <span className="text-[10px] font-black uppercase tracking-widest z-10">Follow Us</span>
+          </button>
+
           <button 
             onClick={() => setActiveTab('scores')}
             className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
-              activeTab === 'scores' 
+              activeTab === 'scores'
                 ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
+            <Trophy className="w-6 h-6" />
             <span className="text-[10px] font-black uppercase tracking-widest">Scores</span>
           </button>
         </div>
