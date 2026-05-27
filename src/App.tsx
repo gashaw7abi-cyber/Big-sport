@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
 import { auth, db, storage, getMessagingInstance } from './firebase';
+import { fetchEspnNews, fetchEspnScores, fetchEspnSummary } from './api';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User, updateProfile } from 'firebase/auth';
 import { collection, query, orderBy, where, getDocs, addDoc, deleteDoc, doc, serverTimestamp, Timestamp, updateDoc, onSnapshot, setDoc } from 'firebase/firestore';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
@@ -217,9 +218,7 @@ function App() {
     setLoading(true);
     try {
       if (activeTab === 'news') {
-        const res = await fetch('/api/news');
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        const data = await res.json();
+        const data = await fetchEspnNews();
         if (checkAborted && checkAborted()) return;
         const newsArray = Array.isArray(data) ? data : [];
         newsArray.sort((a: any, b: any) => new Date(b.published || 0).getTime() - new Date(a.published || 0).getTime());
@@ -245,9 +244,7 @@ function App() {
           handleFirestoreError(e, OperationType.LIST, 'customNews');
         }
       } else if (activeTab === 'scores') {
-        const res = await fetch('/api/scores');
-        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-        const data = await res.json();
+        const data = await fetchEspnScores();
         if (checkAborted && checkAborted()) return;
         let scoresData = Array.isArray(data) ? data : [];
         
@@ -1002,11 +999,8 @@ function App() {
                     if (!matchSummaries[matchId] && !matchSummariesLoading[matchId] && match._league) {
                       setMatchSummariesLoading(prev => ({ ...prev, [matchId]: true }));
                       try {
-                        const res = await fetch(`/api/summary?league=${match._league}&event=${matchId}`);
-                        if (res.ok) {
-                          const data = await res.json();
-                          setMatchSummaries(prev => ({ ...prev, [matchId]: data }));
-                        }
+                        const data = await fetchEspnSummary(match._league, matchId);
+                        setMatchSummaries(prev => ({ ...prev, [matchId]: data }));
                       } catch (err) {
                         console.error('Failed to fetch summary', err);
                       } finally {
