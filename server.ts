@@ -104,10 +104,18 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: "spa",
     });
+    
+    app.get('/ads.txt', (req, res) => {
+      res.sendFile(path.join(process.cwd(), 'public', 'ads.txt'));
+    });
+
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
+    app.get('/ads.txt', (req, res) => {
+      res.sendFile(path.join(distPath, 'ads.txt'));
+    });
     app.get('*', (req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });

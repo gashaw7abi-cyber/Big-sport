@@ -7,6 +7,7 @@ import { collection, query, orderBy, where, getDocs, addDoc, deleteDoc, doc, ser
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getToken, onMessage } from 'firebase/messaging';
 import ReactPlayer from 'react-player';
+import { AdSense } from './components/AdSense';
 const Player = ReactPlayer as any;
 
 // Error Handler helper
@@ -695,6 +696,7 @@ function App() {
           </div>
         ) : activeTab === 'news' ? (
           <div className="space-y-6">
+            <AdSense slot="1234567890" className="mb-4" />
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Newspaper className="w-5 h-5 text-emerald-400" />
@@ -974,6 +976,8 @@ function App() {
                 ))}
               </div>
             </div>
+
+            <AdSense slot="0987654321" className="mb-4 mt-2" />
 
             {scores.length === 0 && (
               <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50">
