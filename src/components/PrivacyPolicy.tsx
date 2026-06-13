@@ -3,7 +3,7 @@ import { Shield } from 'lucide-react';
 
 export const PrivacyPolicy: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-4xl mx-auto">
       <h2 className="text-lg font-bold text-white flex items-center gap-2">
         <Shield className="w-5 h-5 text-emerald-400" />
         Privacy Policy

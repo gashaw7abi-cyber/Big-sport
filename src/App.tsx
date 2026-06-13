@@ -524,20 +524,36 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0f172a] text-slate-200 font-sans pb-24">
+    <div className="min-h-screen bg-[#0f172a] text-slate-200 font-sans pb-24 md:pb-0">
       {/* Header */}
       <header className="bg-[#1e293b] border-b border-slate-700/50 sticky top-0 z-50 shadow-lg">
-        <div className="px-5 py-4 max-w-md mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden shadow-lg shadow-emerald-500/20 bg-emerald-500">
-              <img src="https://i.postimg.cc/g29Gpg7r/1778746810882.jpg" alt="NEW SPORT Logo" className="w-full h-full object-cover" />
+        <div className="px-5 py-4 max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full overflow-hidden shadow-lg shadow-emerald-500/20 bg-emerald-500">
+                <img src="https://i.postimg.cc/g29Gpg7r/1778746810882.jpg" alt="NEW SPORT Logo" className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h1 className="text-xl font-black italic tracking-wider text-white leading-tight">NEW SPORT</h1>
+                <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest hidden sm:block">Live Updates & News</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-black italic tracking-wider text-white leading-tight">NEW SPORT</h1>
-              <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Live Updates & News</p>
-            </div>
+
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-2 border-l border-slate-700/50 pl-6 ml-2">
+              <button onClick={() => changeTab('news')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'news' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'}`}>
+                <Newspaper className="w-4 h-4" /> News
+              </button>
+              <button onClick={() => changeTab('scores')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'scores' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'}`}>
+                <Trophy className="w-4 h-4" /> Scores
+              </button>
+              <button onClick={() => changeTab('socials')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'socials' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'}`}>
+                <Share2 className="w-4 h-4" /> Follow Us
+              </button>
+            </nav>
           </div>
           <div className="flex items-center gap-3">
+
             {isAdmin && (
               <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full" title="Total Visitors">
                 <Users className="w-3.5 h-3.5 text-emerald-400" />
@@ -585,14 +601,14 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="p-4 max-w-md mx-auto space-y-6 mt-2">
+      <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 mt-2">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
             <p className="text-xs font-bold uppercase tracking-widest text-slate-500 animate-pulse">Loading data...</p>
           </div>
         ) : activeTab === 'admin' && isAdmin ? (
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-2xl mx-auto">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-emerald-400" />
               Post New Update
@@ -731,12 +747,12 @@ function App() {
             </div>
             
             {news.length === 0 && customNews.length === 0 && (
-              <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50">
+              <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50 max-w-2xl mx-auto mt-8">
                 <p className="text-slate-400 text-sm">No recent news available.</p>
               </div>
             )}
             
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {(() => {
                 const combinedNews = [
                   ...customNews.map(item => ({
@@ -851,7 +867,7 @@ function App() {
             </div>
           </div>
         ) : activeTab === 'profile' ? (
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-xl mx-auto">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <UserCircle className="w-5 h-5 text-emerald-400" />
               Your Profile
@@ -904,7 +920,7 @@ function App() {
             </div>
           </div>
         ) : activeTab === 'socials' ? (
-          <div className="space-y-6">
+          <div className="space-y-6 max-w-2xl mx-auto">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Share2 className="w-5 h-5 text-emerald-400" />
               Join Our Community
@@ -1017,12 +1033,12 @@ function App() {
             <AdSense slot="0987654321" className="mb-4 mt-2" />
 
             {scores.length === 0 && (
-              <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50">
+              <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50 max-w-2xl mx-auto mt-8">
                 <p className="text-slate-400 text-sm">No match scores available at the moment.</p>
               </div>
             )}
             
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {scores.map((match, i) => {
                 if (!match?.competitions?.[0]?.competitors) return null;
                 const homeTeam = match.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
@@ -1339,7 +1355,7 @@ function App() {
       </main>
 
       {/* Bottom Nav */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-700/50 z-50 pb-safe">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-700/50 z-50 pb-safe">
         <div className="max-w-md mx-auto flex p-2">
           <button 
             onClick={() => changeTab('news')}
