@@ -8,6 +8,7 @@ import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { getToken, onMessage } from 'firebase/messaging';
 import ReactPlayer from 'react-player';
 import { AdSense } from './components/AdSense';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
 const Player = ReactPlayer as any;
 
 // Error Handler helper
@@ -50,7 +51,32 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile' | 'socials'>('news');
+  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile' | 'socials' | 'privacy'>(
+    window.location.pathname === '/privacy' ? 'privacy' : 'news'
+  );
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname;
+      if (path === '/privacy') {
+        setActiveTab('privacy');
+      } else {
+        setActiveTab('news');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const changeTab = (tab: 'news' | 'scores' | 'admin' | 'profile' | 'socials' | 'privacy') => {
+    setActiveTab(tab);
+    if (tab === 'privacy') {
+      window.history.pushState({}, '', '/privacy');
+    } else if (window.location.pathname === '/privacy') {
+      window.history.pushState({}, '', '/');
+    }
+  };
+
   const [news, setNews] = useState<any[]>([]);
   const [customNews, setCustomNews] = useState<any[]>([]);
   const [scores, setScores] = useState<any[]>([]);
@@ -152,7 +178,7 @@ function App() {
       } else {
         setProfileName('');
         setProfileImagePreview(null);
-        if (activeTab === 'profile') setActiveTab('news');
+        if (activeTab === 'profile') changeTab('news');
       }
       setIsAdmin(u?.email === 'gashaw7abi@gmail.com' && !!u?.emailVerified);
     });
@@ -327,7 +353,7 @@ function App() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      setActiveTab('news');
+      changeTab('news');
     } catch (error) {
       console.error('Logout error', error);
     }
@@ -535,7 +561,7 @@ function App() {
                <div className="flex items-center gap-2">
                  {isAdmin && (
                    <button 
-                     onClick={() => setActiveTab('admin')} 
+                     onClick={() => changeTab('admin')} 
                      className={`p-2 transition-colors ${activeTab === 'admin' ? 'text-emerald-400 bg-emerald-500/10 rounded-full' : 'text-slate-400 hover:text-emerald-400'}`}
                      title="Admin"
                    >
@@ -543,7 +569,7 @@ function App() {
                    </button>
                  )}
                  <button 
-                   onClick={() => setActiveTab('profile')}
+                   onClick={() => changeTab('profile')}
                    className={`p-2 transition-colors ${activeTab === 'profile' ? 'text-emerald-400 bg-emerald-500/10 rounded-full' : 'text-slate-400 hover:text-emerald-400'}`}
                    title="Profile"
                  >
@@ -949,8 +975,19 @@ function App() {
                   </div>
                 </a>
               </div>
+
+              <div className="mt-8 border-t border-slate-700/50 pt-6 flex justify-center">
+                <button 
+                  onClick={() => changeTab('privacy')}
+                  className="text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest bg-emerald-500/10 px-6 py-2.5 rounded-xl border border-emerald-500/20"
+                >
+                  Privacy Policy
+                </button>
+              </div>
             </div>
           </div>
+        ) : activeTab === 'privacy' ? (
+          <PrivacyPolicy />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-4">
@@ -1305,7 +1342,7 @@ function App() {
       <nav className="fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-700/50 z-50 pb-safe">
         <div className="max-w-md mx-auto flex p-2">
           <button 
-            onClick={() => setActiveTab('news')}
+            onClick={() => changeTab('news')}
             className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
               activeTab === 'news'
                 ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
@@ -1318,7 +1355,7 @@ function App() {
           
           {/* Central Socials Button */}
           <button 
-            onClick={() => setActiveTab('socials')}
+            onClick={() => changeTab('socials')}
             className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all relative ${
               activeTab === 'socials'
                 ? 'bg-emerald-400/10 text-emerald-400 shadow-lg border border-emerald-400/30' 
@@ -1331,7 +1368,7 @@ function App() {
           </button>
 
           <button 
-            onClick={() => setActiveTab('scores')}
+            onClick={() => changeTab('scores')}
             className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
               activeTab === 'scores'
                 ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
