@@ -1,5 +1,6 @@
 {
   "name": "NEW SPORT",
   "description": "Get the latest football news, live scores, and recent match updates instantly.",
-  "requestFramePermissions": []
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

@@ -11,7 +11,7 @@ async function startServer() {
   // Proxy for ESPN Sports News Api (Multiple Leagues)
   app.get("/api/news", async (req, res) => {
     try {
-      const leagues = ['eng.1', 'esp.1', 'uefa.champions'];
+      const leagues = ['eng.1', 'eng.2', 'esp.1', 'ita.1', 'ger.1', 'fra.1', 'uefa.champions', 'uefa.europa', 'uefa.europa.conf'];
       let allArticles: any[] = [];
       
       await Promise.all(leagues.map(async (league) => {
