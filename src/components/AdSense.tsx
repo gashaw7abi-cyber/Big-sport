@@ -34,12 +34,12 @@ export const AdSense: React.FC<AdSenseProps> = ({
   }, []);
 
   return (
-    <div className={`w-full overflow-hidden text-center bg-[#1e293b] rounded-lg border border-slate-700/30 p-1.5 min-h-[80px] ${className}`}>
-      <div className="text-[9px] text-slate-600 mb-0.5 uppercase tracking-widest font-medium opacity-40">Ad</div>
+    <div className={`w-full overflow-hidden text-center bg-[#1e293b] rounded-lg border border-slate-700/20 p-1 min-h-[40px] ${className}`}>
+      <div className="text-[8px] text-slate-600 mb-0.5 uppercase tracking-widest font-medium opacity-30">Ad</div>
       <div className="w-full flex justify-center">
         <ins
           className="adsbygoogle"
-          style={{ display: 'block', width: '100%', minWidth: '250px', minHeight: '50px' }}
+          style={{ display: 'block', width: '100%', minWidth: '250px', minHeight: '32px' }}
           data-ad-client={client}
           data-ad-slot={slot}
           data-ad-format={format}
