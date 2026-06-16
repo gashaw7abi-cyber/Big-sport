@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube, Menu, X, MessageSquare } from 'lucide-react';
 import { auth, db, storage, getMessagingInstance } from './firebase';
 import { fetchEspnNews, fetchEspnScores, fetchEspnSummary } from './api';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User, updateProfile } from 'firebase/auth';
@@ -9,6 +9,9 @@ import { getToken, onMessage } from 'firebase/messaging';
 import ReactPlayer from 'react-player';
 import { AdSense } from './components/AdSense';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { AboutUs } from './components/AboutUs';
+import { ContactUs } from './components/ContactUs';
+import { Footer } from './components/Footer';
 const Player = ReactPlayer as any;
 
 // Error Handler helper
@@ -57,15 +60,22 @@ function handleFirestoreError(error: unknown, operationType: OperationType, path
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile' | 'socials' | 'privacy'>(
-    window.location.pathname === '/privacy' ? 'privacy' : 'news'
+  const [activeTab, setActiveTab] = useState<'news' | 'scores' | 'admin' | 'profile' | 'privacy' | 'about' | 'contact'>(
+    window.location.pathname === '/privacy' ? 'privacy' : 
+    window.location.pathname === '/about' ? 'about' : 
+    window.location.pathname === '/contact' ? 'contact' : 'news'
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handlePopState = () => {
       const path = window.location.pathname;
       if (path === '/privacy') {
         setActiveTab('privacy');
+      } else if (path === '/about') {
+        setActiveTab('about');
+      } else if (path === '/contact') {
+        setActiveTab('contact');
       } else {
         setActiveTab('news');
       }
@@ -74,12 +84,15 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const changeTab = (tab: 'news' | 'scores' | 'admin' | 'profile' | 'socials' | 'privacy') => {
+  const changeTab = (tab: 'news' | 'scores' | 'admin' | 'profile' | 'privacy' | 'about' | 'contact') => {
     setActiveTab(tab);
-    if (tab === 'privacy') {
-      window.history.pushState({}, '', '/privacy');
-    } else if (window.location.pathname === '/privacy') {
-      window.history.pushState({}, '', '/');
+    setIsMobileMenuOpen(false);
+    if (tab === 'privacy' || tab === 'about' || tab === 'contact') {
+      window.history.pushState({}, '', `/${tab}`);
+    } else {
+      if (window.location.pathname !== '/') {
+        window.history.pushState({}, '', '/');
+      }
     }
   };
 
@@ -510,18 +523,32 @@ function App() {
     }
   };
 
-  const handleShare = async (e: React.MouseEvent, title: string, text: string, url: string) => {
+  const handleShare = async (e: React.MouseEvent, title: string, text: string, url: string, imageUrl?: string) => {
     e.preventDefault();
     e.stopPropagation();
     try {
+      let shareData: ShareData = {
+        title,
+        text,
+        url
+      };
+
       if (navigator.share) {
-        await navigator.share({
-          title,
-          text,
-          url
-        });
+        if (imageUrl) {
+          try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], 'image.jpg', { type: blob.type });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              shareData.files = [file];
+            }
+          } catch (fetchErr) {
+            console.error("Could not fetch image for sharing:", fetchErr);
+          }
+        }
+        await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(`${title}\n\n${text}\n\n${url}`);
+        await navigator.clipboard.writeText(`${title}\n\n${text}\n\n${url}${imageUrl ? '\n\nImage: ' + imageUrl : ''}`);
         showCustomAlert("News copied to clipboard!");
       }
     } catch (err) {
@@ -553,15 +580,15 @@ function App() {
               <button onClick={() => changeTab('scores')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'scores' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'}`}>
                 <Trophy className="w-4 h-4" /> Scores
               </button>
-              <button onClick={() => changeTab('socials')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === 'socials' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'text-slate-400 hover:text-white'}`}>
-                <Share2 className="w-4 h-4" /> Follow Us
+              <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-slate-400 hover:text-white`}>
+                <MessageSquare className="w-4 h-4" /> Support
               </button>
             </nav>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
 
             {isAdmin && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full" title="Total Visitors">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full hidden sm:flex" title="Total Visitors">
                 <Users className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="text-xs font-bold text-emerald-400">{activeUsersCount}</span>
               </div>
@@ -569,18 +596,18 @@ function App() {
             
             <button 
               onClick={handlePushOptIn}
-              className={`p-2 transition-colors rounded-xl ${pushEnabled ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-emerald-400'}`}
+              className={`p-2 transition-colors rounded-xl hidden sm:flex ${pushEnabled ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-500 hover:text-emerald-400'}`}
               title={pushEnabled ? "Notifications Enabled" : "Enable Push Notifications"}
             >
               {pushEnabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />}
             </button>
 
             {!user ? (
-               <button onClick={handleLogin} className="p-2 text-slate-500 hover:text-emerald-400 transition-colors" title="Admin Login">
+               <button onClick={handleLogin} className="p-2 text-slate-500 hover:text-emerald-400 transition-colors hidden sm:flex" title="Admin Login">
                  <Lock className="w-5 h-5" />
                </button>
             ) : (
-               <div className="flex items-center gap-2">
+               <div className="hidden sm:flex items-center gap-2">
                  {isAdmin && (
                    <button 
                      onClick={() => changeTab('admin')} 
@@ -602,9 +629,89 @@ function App() {
                  </button>
                </div>
             )}
+
+            {/* Hamburger Menu Toggle (Mobile Only) */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden p-2 text-slate-400 hover:text-white transition-colors z-50 rounded-lg hover:bg-slate-800"
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </header>
+
+      {/* Mobile Drawer Navigation */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed inset-0 z-40 bg-[#0f172a]/95 backdrop-blur-xl border-slate-700/50 flex flex-col pt-24 pb-8 px-6 animate-in slide-in-from-right-full duration-200">
+          <nav className="flex flex-col gap-4">
+            <button 
+              onClick={() => changeTab('news')} 
+              className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${activeTab === 'news' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'}`}
+            >
+              <Newspaper className="w-6 h-6" /> 
+              <span className="text-lg font-bold">News</span>
+            </button>
+            <button 
+              onClick={() => changeTab('scores')} 
+              className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${activeTab === 'scores' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'}`}
+            >
+              <Trophy className="w-6 h-6" /> 
+              <span className="text-lg font-bold">Scores</span>
+            </button>
+            <button 
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+              }} 
+              className="p-4 rounded-2xl flex items-center gap-4 transition-all bg-slate-800/50 text-slate-300 hover:bg-slate-800"
+            >
+              <MessageSquare className="w-6 h-6" /> 
+              <span className="text-lg font-bold">Contact Us</span>
+            </button>
+          </nav>
+
+          <div className="mt-8 border-t border-slate-700/50 pt-8 flex flex-col gap-4">
+            <button 
+              onClick={handlePushOptIn}
+              className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${pushEnabled ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'}`}
+            >
+              {pushEnabled ? <Bell className="w-6 h-6" /> : <BellOff className="w-6 h-6" />}
+              <span className="text-lg font-bold">{pushEnabled ? 'Notifications Enabled' : 'Enable Notifications'}</span>
+            </button>
+
+            {!user ? (
+               <button onClick={() => { handleLogin(); setIsMobileMenuOpen(false); }} className="p-4 rounded-2xl flex items-center gap-4 bg-slate-800/50 text-slate-300 hover:bg-slate-800 transition-all">
+                 <Lock className="w-6 h-6" />
+                 <span className="text-lg font-bold">Admin Login</span>
+               </button>
+            ) : (
+               <>
+                 {isAdmin && (
+                   <button 
+                     onClick={() => changeTab('admin')} 
+                     className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${activeTab === 'admin' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'}`}
+                   >
+                     <Users className="w-6 h-6" />
+                     <span className="text-lg font-bold">Admin Panel</span>
+                   </button>
+                 )}
+                 <button 
+                   onClick={() => changeTab('profile')}
+                   className={`p-4 rounded-2xl flex items-center gap-4 transition-all ${activeTab === 'profile' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-800/50 text-slate-300 hover:bg-slate-800'}`}
+                 >
+                   <UserCircle className="w-6 h-6" />
+                   <span className="text-lg font-bold">Your Profile</span>
+                 </button>
+                 <button onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }} className="p-4 rounded-2xl flex items-center gap-4 bg-slate-800/50 text-red-400 hover:bg-red-500/10 transition-all">
+                   <LogOut className="w-6 h-6" />
+                   <span className="text-lg font-bold">Logout</span>
+                 </button>
+               </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 mt-2">
@@ -758,7 +865,7 @@ function App() {
               </div>
             )}
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="flex flex-col gap-10 w-full">
               {(() => {
                 const combinedNews = [
                   ...customNews.map(item => ({
@@ -778,10 +885,10 @@ function App() {
                     return (
                       <div 
                         key={`custom-${item.id}`} 
-                        className="block bg-gradient-to-br from-emerald-900/40 to-[#1e293b] rounded-[2rem] overflow-hidden border border-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-xl shadow-emerald-900/20 group"
+                        className="block bg-gradient-to-br from-emerald-900/40 to-[#1e293b] rounded-[2rem] overflow-hidden border border-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-xl shadow-emerald-900/20 group pb-4"
                       >
                         {item.videoUrl ? (
-                          <div className="relative h-56 w-full overflow-hidden bg-black">
+                          <div className="relative h-72 md:h-[500px] w-full overflow-hidden bg-black">
                              <Player
                                url={item.videoUrl}
                                controls
@@ -790,7 +897,7 @@ function App() {
                              />
                           </div>
                         ) : item.imageUrl ? (
-                          <div className="relative h-56 overflow-hidden bg-slate-800">
+                          <div className="relative h-72 md:h-[500px] w-full overflow-hidden bg-slate-800">
                             <img 
                               src={item.imageUrl} 
                               alt="" 
@@ -799,26 +906,26 @@ function App() {
                             <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] to-transparent opacity-80" />
                           </div>
                         ) : null}
-                        <div className="p-6 relative">
-                          <div className="mb-3">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-[#1e293b] bg-emerald-400 px-3 py-1.5 rounded-full">
+                        <div className="p-6 md:p-8 relative">
+                          <div className="mb-4">
+                            <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-[#1e293b] bg-emerald-400 px-4 py-2 rounded-full shadow-lg shadow-emerald-500/20">
                               Admin Update
                             </span>
                           </div>
-                          <h3 className="text-lg font-bold text-white mb-3 leading-snug group-hover:text-emerald-400 transition-colors">
+                          <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white mb-4 leading-normal md:leading-snug group-hover:text-emerald-400 transition-colors">
                             {item.headline}
                           </h3>
-                          <p className="text-sm text-slate-300 line-clamp-3 leading-relaxed whitespace-pre-wrap">
+                          <p className="text-base md:text-lg text-slate-300 leading-relaxed whitespace-pre-wrap">
                             {item.description}
                           </p>
-                          <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+                          <div className="mt-8 flex items-center justify-between text-xs md:text-sm font-bold uppercase tracking-wider">
                             <span className="text-slate-500">{new Date(item.publishedAt?.seconds ? item.publishedAt.seconds * 1000 : (item.publishedAt || Date.now())).toLocaleDateString()}</span>
                             <button
-                              onClick={(e) => handleShare(e, item.headline, item.description, window.location.origin)}
-                              className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 flex items-center justify-center transition-colors"
+                              onClick={(e) => handleShare(e, item.headline, item.description, 'https://newsport.com.et', item.imageUrl)}
+                              className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 flex items-center justify-center transition-colors"
                               title="Share"
                             >
-                              <Share2 className="w-4 h-4" />
+                              <Share2 className="w-5 h-5 md:w-6 md:h-6" />
                             </button>
                           </div>
                         </div>
@@ -828,10 +935,10 @@ function App() {
                     return (
                       <div 
                         key={`api-${i}`} 
-                        className="block bg-[#1e293b] rounded-[2rem] overflow-hidden border border-slate-700/50 hover:border-emerald-500/50 transition-all hover:shadow-xl hover:shadow-emerald-500/10 group"
+                        className="block bg-[#1e293b] rounded-[2rem] overflow-hidden border border-slate-700/50 hover:border-emerald-500/50 transition-all hover:shadow-xl hover:shadow-emerald-500/10 group pb-4"
                       >
                         {item.images?.[0]?.url && (
-                          <div className="relative h-56 overflow-hidden bg-slate-800">
+                          <div className="relative h-72 md:h-[500px] overflow-hidden bg-slate-800">
                             <img 
                               src={item.images[0].url} 
                               alt="" 
@@ -840,27 +947,27 @@ function App() {
                             <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] to-transparent opacity-80" />
                           </div>
                         )}
-                        <div className="p-6 relative">
-                          <div className="mb-3 flex gap-2">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full">
+                        <div className="p-6 md:p-8 relative">
+                          <div className="mb-4 flex gap-3">
+                            <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20">
                               Football
                             </span>
                           </div>
-                          <h3 className="text-lg font-bold text-white mb-3 leading-snug group-hover:text-emerald-400 transition-colors">
+                          <h3 className="text-xl md:text-2xl lg:text-3xl font-black text-white mb-4 leading-normal md:leading-snug group-hover:text-emerald-400 transition-colors">
                             {item.headline}
                           </h3>
-                          <p className="text-sm text-slate-400 line-clamp-3 leading-relaxed">
+                          <p className="text-base md:text-lg text-slate-400 leading-relaxed">
                             {item.description}
                           </p>
-                          <div className="mt-6 flex items-center justify-between text-xs font-bold uppercase tracking-wider">
+                          <div className="mt-8 flex items-center justify-between text-xs md:text-sm font-bold uppercase tracking-wider">
                             <span className="text-slate-500">{new Date(item.published).toLocaleDateString()}</span>
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-4">
                               <button
-                                onClick={(e) => handleShare(e, item.headline, item.description, window.location.origin)}
-                                className="w-8 h-8 rounded-full bg-slate-800/80 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 flex items-center justify-center transition-colors"
+                                onClick={(e) => handleShare(e, item.headline, item.description, 'https://newsport.com.et', item.images?.[0]?.url)}
+                                className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-slate-800/80 hover:bg-emerald-500/20 text-slate-400 hover:text-emerald-400 flex items-center justify-center transition-colors"
                                 title="Share"
                               >
-                                <Share2 className="w-4 h-4" />
+                                <Share2 className="w-5 h-5 md:w-6 md:h-6" />
                               </button>
                             </div>
                           </div>
@@ -870,6 +977,33 @@ function App() {
                   }
                 });
               })()}
+            </div>
+            
+            <div className="mt-12 pt-10 border-t border-slate-700/50 w-full">
+              <div className="text-center mb-10">
+                <h2 className="text-2xl md:text-3xl font-black text-white mb-4 italic tracking-tight">Our Growing Community</h2>
+                <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
+                  We are more than just a sports news platform. We are a vibrant community of football enthusiasts, bringing you live updates, in-depth analysis, and connecting fans across the globe. Join us as we continue to grow and celebrate the beautiful game.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-[#0f172a] rounded-2xl p-6 flex flex-col items-center justify-center border border-slate-700/50 aspect-[4/3]">
+                  <span className="text-4xl md:text-5xl font-black text-emerald-400 mb-2">5K+</span>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Members</span>
+                </div>
+                <div className="bg-[#0f172a] rounded-2xl p-6 flex flex-col items-center justify-center border border-slate-700/50 aspect-[4/3]">
+                  <span className="text-4xl md:text-5xl font-black text-emerald-400 mb-2">50+</span>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Events<br/>Hosted</span>
+                </div>
+                <div className="bg-[#0f172a] rounded-2xl p-6 flex flex-col items-center justify-center border border-slate-700/50 aspect-[4/3]">
+                  <span className="text-4xl md:text-5xl font-black text-emerald-400 mb-2">20+</span>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Partners</span>
+                </div>
+                <div className="bg-[#0f172a] rounded-2xl p-6 flex flex-col items-center justify-center border border-slate-700/50 aspect-[4/3]">
+                  <span className="text-4xl md:text-5xl font-black text-emerald-400 mb-2">100+</span>
+                  <span className="text-[10px] md:text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Projects<br/>Launched</span>
+                </div>
+              </div>
             </div>
           </div>
         ) : activeTab === 'profile' ? (
@@ -925,91 +1059,12 @@ function App() {
               </form>
             </div>
           </div>
-        ) : activeTab === 'socials' ? (
-          <div className="space-y-6 max-w-2xl mx-auto">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
-              <Share2 className="w-5 h-5 text-emerald-400" />
-              Join Our Community
-            </h2>
-            <div className="bg-[#1e293b] p-6 rounded-3xl border border-slate-700/50">
-              <p className="text-slate-400 text-sm mb-6 text-center">Follow us on any social media for updates and news.</p>
-              
-              <div className="flex flex-col gap-3">
-                <a href="https://t.me/newsport5" target="_blank" rel="noreferrer" className="w-full bg-[#2ba6e1] hover:bg-[#229ed9] text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                    <Send className="w-6 h-6 text-white ml-[-2px]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">Telegram Channel</span>
-                    <span className="text-white/80 font-medium text-xs">@newsport5</span>
-                  </div>
-                </a>
-                
-                <a href="https://t.me/newsporti_bot" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-slate-700/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-[#2ba6e1]/20 flex items-center justify-center shrink-0">
-                    <Bot className="w-6 h-6 text-[#2ba6e1]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">Telegram Bot</span>
-                    <span className="text-slate-400 font-medium text-xs">@newsporti_bot</span>
-                  </div>
-                </a>
-
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#1877F2]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-[#1877F2]/20 flex items-center justify-center shrink-0">
-                    <Facebook className="w-6 h-6 text-[#1877F2]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">Facebook</span>
-                    <span className="text-slate-400 font-medium text-xs">Follow our page</span>
-                  </div>
-                </a>
-
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#E1306C]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-[#E1306C]/20 flex items-center justify-center shrink-0">
-                    <Instagram className="w-6 h-6 text-[#E1306C]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">Instagram</span>
-                    <span className="text-slate-400 font-medium text-xs">Pictures & Reels</span>
-                  </div>
-                </a>
-
-                <a href="https://youtube.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-[#FF0000]/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-[#FF0000]/20 flex items-center justify-center shrink-0">
-                    <Youtube className="w-6 h-6 text-[#FF0000]" />
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">YouTube</span>
-                    <span className="text-slate-400 font-medium text-xs">Watch our videos</span>
-                  </div>
-                </a>
-
-                <a href="https://twitter.com" target="_blank" rel="noreferrer" className="w-full bg-[#0f172a] hover:bg-[#253347] border border-slate-700/50 text-white rounded-2xl p-4 flex items-center gap-4 transition-colors">
-                  <div className="w-12 h-12 rounded-full bg-slate-700 flex items-center justify-center shrink-0">
-                    <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.008 4.07H5.078z" />
-                    </svg>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="font-bold text-base">X (Twitter)</span>
-                    <span className="text-slate-400 font-medium text-xs">Follow updates</span>
-                  </div>
-                </a>
-              </div>
-
-              <div className="mt-8 border-t border-slate-700/50 pt-6 flex justify-center">
-                <button 
-                  onClick={() => changeTab('privacy')}
-                  className="text-sm font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest bg-emerald-500/10 px-6 py-2.5 rounded-xl border border-emerald-500/20"
-                >
-                  Privacy Policy
-                </button>
-              </div>
-            </div>
-          </div>
         ) : activeTab === 'privacy' ? (
           <PrivacyPolicy />
+        ) : activeTab === 'about' ? (
+          <AboutUs />
+        ) : activeTab === 'contact' ? (
+          <ContactUs />
         ) : (
           <div className="space-y-6">
             <div className="flex flex-col gap-4">
@@ -1358,50 +1413,8 @@ function App() {
             </div>
           </div>
         )}
+        <Footer changeTab={changeTab} />
       </main>
-
-      {/* Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-xl border-t border-slate-700/50 z-50 pb-safe">
-        <div className="max-w-md mx-auto flex p-2">
-          <button 
-            onClick={() => changeTab('news')}
-            className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
-              activeTab === 'news'
-                ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Newspaper className="w-6 h-6" />
-            <span className="text-[10px] font-black uppercase tracking-widest">News</span>
-          </button>
-          
-          {/* Central Socials Button */}
-          <button 
-            onClick={() => changeTab('socials')}
-            className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all relative ${
-              activeTab === 'socials'
-                ? 'bg-emerald-400/10 text-emerald-400 shadow-lg border border-emerald-400/30' 
-                : 'text-slate-400 hover:text-emerald-400'
-            }`}
-          >
-            <div className="absolute inset-0 bg-gradient-to-t from-emerald-400/5 to-transparent rounded-2xl pointer-events-none" />
-            <Share2 className="w-6 h-6 z-10" />
-            <span className="text-[10px] font-black uppercase tracking-widest z-10">Follow Us</span>
-          </button>
-
-          <button 
-            onClick={() => changeTab('scores')}
-            className={`flex-1 py-4 flex flex-col items-center gap-1.5 rounded-2xl transition-all ${
-              activeTab === 'scores'
-                ? 'bg-[#1e293b] text-emerald-400 shadow-lg border border-slate-700/50' 
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Trophy className="w-6 h-6" />
-            <span className="text-[10px] font-black uppercase tracking-widest">Scores</span>
-          </button>
-        </div>
-      </nav>
     </div>
   );
 }
