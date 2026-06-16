@@ -8,25 +8,31 @@ async function startServer() {
 
   app.use(express.json());
 
-  // Proxy for ESPN Sports News Api (Multiple Leagues)
+// Proxy for ESPN Sports News Api (Multiple Leagues)
+  let newsCache: { data: any[]; lastFetched: number } | null = null;
+  const NEWS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   app.get("/api/news", async (req, res) => {
+    const now = Date.now();
+    if (newsCache && (now - newsCache.lastFetched < NEWS_CACHE_TTL)) {
+      return res.json(newsCache.data);
+    }
+
     try {
       const leagues = ['eng.1', 'eng.2', 'esp.1', 'ita.1', 'ger.1', 'fra.1', 'uefa.champions', 'uefa.europa', 'uefa.europa.conf'];
       let allArticles: any[] = [];
       
       await Promise.all(leagues.map(async (league) => {
-        for (let page = 1; page <= 3; page++) {
-          try {
-            const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/news?limit=50&page=${page}`);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.articles && data.articles.length > 0) {
-                allArticles.push(...data.articles);
-              }
+        try {
+          const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/news?limit=30`);
+          if (response.ok) {
+            const data = await response.json();
+            if (data.articles && data.articles.length > 0) {
+              allArticles.push(...data.articles);
             }
-          } catch (e) {
-             // ignore error for single league
           }
+        } catch (e) {
+           // ignore error for single league
         }
       }));
       
@@ -35,10 +41,22 @@ async function startServer() {
       // Sort by published descending
       uniqueArticles.sort((a: any, b: any) => new Date(b.published).getTime() - new Date(a.published).getTime());
       
-      res.json(uniqueArticles);
+      // Save to cache
+      if (uniqueArticles.length > 0) {
+        newsCache = {
+          data: uniqueArticles,
+          lastFetched: now
+        };
+      }
+      
+      res.json(uniqueArticles.length > 0 ? uniqueArticles : (newsCache ? newsCache.data : []));
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Failed to fetch news" });
+      if (newsCache) {
+        res.json(newsCache.data);
+      } else {
+        res.status(500).json({ error: "Failed to fetch news" });
+      }
     }
   });
 
