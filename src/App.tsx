@@ -715,12 +715,7 @@ function App() {
 
       {/* Main Content */}
       <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 mt-2">
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-4">
-            <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin" />
-            <p className="text-xs font-bold uppercase tracking-widest text-slate-500 animate-pulse">Loading data...</p>
-          </div>
-        ) : activeTab === 'admin' && isAdmin ? (
+        {activeTab === 'admin' && isAdmin ? (
           <div className="space-y-6 max-w-2xl mx-auto">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-emerald-400" />
@@ -851,7 +846,7 @@ function App() {
           </div>
         ) : activeTab === 'news' ? (
           <div className="space-y-4">
-            <AdSense slot="1234567890" className="mb-1" />
+            <AdSense slot="1234567890" className="mb-4 w-full md:w-1/2 mx-auto" />
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Newspaper className="w-5 h-5 text-emerald-400" />
@@ -859,14 +854,26 @@ function App() {
               </h2>
             </div>
             
-            {news.length === 0 && customNews.length === 0 && (
+            {loading ? (
+              <div className="flex flex-col gap-10 w-full animate-pulse mt-4">
+                {[1, 2, 3].map((n) => (
+                  <div key={n} className="bg-slate-800/50 rounded-[2rem] overflow-hidden border border-slate-700/50">
+                    <div className="h-72 md:h-[400px] bg-slate-700/50"></div>
+                    <div className="p-6 md:p-8 space-y-4">
+                       <div className="h-6 bg-slate-700/50 rounded w-3/4"></div>
+                       <div className="h-4 bg-slate-700/50 rounded w-full"></div>
+                       <div className="h-4 bg-slate-700/50 rounded w-5/6"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : news.length === 0 && customNews.length === 0 ? (
               <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50 max-w-2xl mx-auto mt-8">
                 <p className="text-slate-400 text-sm">No recent news available.</p>
               </div>
-            )}
-            
-            <div className="flex flex-col gap-10 w-full">
-              {(() => {
+            ) : (
+              <div className="flex flex-col gap-10 w-full mt-4">
+                {(() => {
                 const combinedNews = [
                   ...customNews.map(item => ({
                     ...item, 
@@ -978,6 +985,7 @@ function App() {
                 });
               })()}
             </div>
+            )}
             
             <div className="mt-12 pt-10 border-t border-slate-700/50 w-full">
               <div className="text-center mb-10">
@@ -1091,15 +1099,32 @@ function App() {
               </div>
             </div>
 
-            <AdSense slot="0987654321" className="mb-1 mt-1" />
+            <AdSense slot="0987654321" className="mb-4 mt-4 w-full md:w-1/2 mx-auto" />
 
-            {scores.length === 0 && (
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse mt-4">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <div key={n} className="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50">
+                    <div className="h-4 bg-slate-700/50 rounded w-1/3 mx-auto mb-6"></div>
+                    <div className="space-y-4">
+                      <div className="flex justify-between">
+                         <div className="h-6 bg-slate-700/50 rounded w-1/3"></div>
+                         <div className="h-6 bg-slate-700/50 rounded w-8"></div>
+                      </div>
+                      <div className="flex justify-between">
+                         <div className="h-6 bg-slate-700/50 rounded w-1/3"></div>
+                         <div className="h-6 bg-slate-700/50 rounded w-8"></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : scores.length === 0 ? (
               <div className="bg-[#1e293b] rounded-2xl p-8 text-center border border-slate-700/50 max-w-2xl mx-auto mt-8">
                 <p className="text-slate-400 text-sm">No match scores available at the moment.</p>
               </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
               {scores.map((match, i) => {
                 if (!match?.competitions?.[0]?.competitors) return null;
                 const homeTeam = match.competitions[0].competitors.find((c: any) => c.homeAway === 'home');
@@ -1411,6 +1436,7 @@ function App() {
                 );
               })}
             </div>
+            )}
           </div>
         )}
         <Footer changeTab={changeTab} />

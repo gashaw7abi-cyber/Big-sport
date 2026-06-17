@@ -11,8 +11,8 @@ interface AdSenseProps {
 export const AdSense: React.FC<AdSenseProps> = ({ 
   client = "ca-pub-1052173421990358", 
   slot, 
-  format = "auto", 
-  responsive = "true",
+  format = "horizontal", 
+  responsive = "false",
   className = ""
 }) => {
   const isLoaded = useRef(false);
@@ -34,12 +34,12 @@ export const AdSense: React.FC<AdSenseProps> = ({
   }, []);
 
   return (
-    <div className={`w-full overflow-hidden text-center bg-[#1e293b] rounded-lg border border-slate-700/20 p-1 min-h-[40px] ${className}`}>
+    <div className={`overflow-hidden text-center bg-[#1e293b] rounded-lg border border-slate-700/20 p-1 min-h-[40px] ${className}`}>
       <div className="text-[8px] text-slate-600 mb-0.5 uppercase tracking-widest font-medium opacity-30">Ad</div>
-      <div className="w-full flex justify-center">
+      <div className="flex justify-center overflow-hidden">
         <ins
           className="adsbygoogle"
-          style={{ display: 'block', width: '100%', minWidth: '250px', minHeight: '32px' }}
+          style={{ display: 'inline-block', width: '320px', height: '50px' }}
           data-ad-client={client}
           data-ad-slot={slot}
           data-ad-format={format}
