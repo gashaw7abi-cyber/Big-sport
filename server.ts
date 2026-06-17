@@ -1,12 +1,41 @@
 import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
+import fs from "fs";
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(express.json());
+
+  app.get("/share", (req, res) => {
+    const { title, desc, image, redirect } = req.query;
+    const safeTitle = String(title || "News").replace(/"/g, '&quot;');
+    const safeDesc = String(desc || "").replace(/"/g, '&quot;');
+    const safeImage = String(image || "").replace(/"/g, '&quot;');
+    const safeRedirect = String(redirect || "/").replace(/"/g, '&quot;');
+
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>${safeTitle}</title>
+  <meta property="og:title" content="${safeTitle}">
+  <meta property="og:description" content="${safeDesc}">
+  <meta property="og:image" content="${safeImage}">
+  <meta property="og:type" content="article">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${safeTitle}">
+  <meta name="twitter:description" content="${safeDesc}">
+  <meta name="twitter:image" content="${safeImage}">
+  <meta http-equiv="refresh" content="0;url=${safeRedirect}">
+</head>
+<body>
+  <p>Redirecting to <a href="${safeRedirect}">the article</a>...</p>
+</body>
+</html>`);
+  });
 
 // Proxy for ESPN Sports News Api (Multiple Leagues)
   let newsCache: { data: any[]; lastFetched: number } | null = null;
@@ -130,12 +159,35 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    app.use(express.static(distPath, { index: false }));
     app.get('/ads.txt', (req, res) => {
       res.sendFile(path.join(distPath, 'ads.txt'));
     });
     app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+      let html = fs.readFileSync(path.join(distPath, 'index.html'), 'utf-8');
+      
+      const { og_title, og_desc, og_image } = req.query;
+      
+      if (og_title || og_desc || og_image) {
+        if (og_title) {
+          const safeTitle = String(og_title).replace(/"/g, '&quot;');
+          html = html.replace(/<title>.*<\/title>/, `<title>${safeTitle}</title>`);
+          html = html.replace(/<meta property="og:title" content="[^"]*"/, `<meta property="og:title" content="${safeTitle}"`);
+          html = html.replace(/<meta name="twitter:title" content="[^"]*"/, `<meta name="twitter:title" content="${safeTitle}"`);
+        }
+        if (og_desc) {
+          const safeDesc = String(og_desc).replace(/"/g, '&quot;');
+          html = html.replace(/<meta name="description" content="[^"]*"/, `<meta name="description" content="${safeDesc}"`);
+          html = html.replace(/<meta property="og:description" content="[^"]*"/, `<meta property="og:description" content="${safeDesc}"`);
+          html = html.replace(/<meta name="twitter:description" content="[^"]*"/, `<meta name="twitter:description" content="${safeDesc}"`);
+        }
+        if (og_image) {
+          const safeImage = String(og_image).replace(/"/g, '&quot;');
+          html = html.replace(/<\/head>/i, `<meta property="og:image" content="${safeImage}" />\n<meta name="twitter:image" content="${safeImage}" />\n</head>`);
+        }
+      }
+      
+      res.send(html);
     });
   }
 

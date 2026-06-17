@@ -95,9 +95,13 @@ export const fetchEspnSummary = async (league: string, event: string) => {
     throw new Error("Local summary API failed or returned non-JSON");
   } catch (error) {
     console.warn("Falling back to direct ESPN API summary fetching:", error);
-    
-    const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${event}`);
-    if (!response.ok) throw new Error("Failed to fetch from ESPN directly");
-    return await response.json();
+    try {
+      const response = await fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${league}/summary?event=${event}`);
+      if (!response.ok) throw new Error("Failed to fetch from ESPN directly");
+      return await response.json();
+    } catch (e) {
+      console.error("Direct fetch failed too:", e);
+      return {};
+    }
   }
 };

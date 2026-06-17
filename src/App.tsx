@@ -527,10 +527,10 @@ function App() {
     e.preventDefault();
     e.stopPropagation();
     try {
-      let shareData: ShareData = {
+      const shareData: ShareData = {
         title,
-        text,
-        url
+        text: `${title}\n\n${text}\n\nRead more at: `,
+        url: 'https://newsport.com.et'
       };
 
       if (navigator.share) {
@@ -548,7 +548,7 @@ function App() {
         }
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(`${title}\n\n${text}\n\n${url}${imageUrl ? '\n\nImage: ' + imageUrl : ''}`);
+        await navigator.clipboard.writeText(`${title}\n\n${text}\n\nhttps://newsport.com.et`);
         showCustomAlert("News copied to clipboard!");
       }
     } catch (err) {
@@ -714,9 +714,9 @@ function App() {
       )}
 
       {/* Main Content */}
-      <main className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto space-y-6 mt-2">
+      <main className="w-full mx-auto space-y-6 mt-2">
         {activeTab === 'admin' && isAdmin ? (
-          <div className="space-y-6 max-w-2xl mx-auto">
+          <div className="space-y-6 max-w-2xl mx-auto p-4 md:p-6 lg:p-8">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <Plus className="w-5 h-5 text-emerald-400" />
               Post New Update
@@ -845,21 +845,23 @@ function App() {
             </div>
           </div>
         ) : activeTab === 'news' ? (
-          <div className="space-y-4">
-            <AdSense slot="1234567890" className="mb-4 w-full md:w-1/2 mx-auto" />
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Newspaper className="w-5 h-5 text-emerald-400" />
-                Latest Headlines
-              </h2>
+          <div className="space-y-0 text-white">
+            <div className="px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
+              <AdSense slot="1234567890" className="mb-4 w-full md:w-1/2 mx-auto" />
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Newspaper className="w-5 h-5 text-emerald-400" />
+                  Latest Headlines
+                </h2>
+              </div>
             </div>
             
             {loading ? (
-              <div className="flex flex-col gap-10 w-full animate-pulse mt-4">
+              <div className="flex flex-col gap-6 w-full animate-pulse mt-4 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
                 {[1, 2, 3].map((n) => (
-                  <div key={n} className="bg-slate-800/50 rounded-[2rem] overflow-hidden border border-slate-700/50">
-                    <div className="h-72 md:h-[400px] bg-slate-700/50"></div>
-                    <div className="p-6 md:p-8 space-y-4">
+                  <div key={n} className="bg-slate-800/50 rounded-none md:rounded-2xl overflow-hidden border border-slate-700/50">
+                    <div className="h-56 md:h-72 bg-slate-700/50"></div>
+                    <div className="p-5 md:p-8 space-y-4">
                        <div className="h-6 bg-slate-700/50 rounded w-3/4"></div>
                        <div className="h-4 bg-slate-700/50 rounded w-full"></div>
                        <div className="h-4 bg-slate-700/50 rounded w-5/6"></div>
@@ -872,7 +874,7 @@ function App() {
                 <p className="text-slate-400 text-sm">No recent news available.</p>
               </div>
             ) : (
-              <div className="flex flex-col gap-10 w-full mt-4">
+              <div className="flex flex-col gap-6 md:gap-8 w-full mt-4">
                 {(() => {
                 const combinedNews = [
                   ...customNews.map(item => ({
@@ -892,10 +894,10 @@ function App() {
                     return (
                       <div 
                         key={`custom-${item.id}`} 
-                        className="block bg-gradient-to-br from-emerald-900/40 to-[#1e293b] rounded-[2rem] overflow-hidden border border-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-xl shadow-emerald-900/20 group pb-4"
+                        className="block bg-gradient-to-br from-emerald-900/40 to-[#1e293b] border-y border-emerald-500/30 hover:border-emerald-500/60 transition-all shadow-xl shadow-emerald-900/20 group pb-4 w-full"
                       >
                         {item.videoUrl ? (
-                          <div className="relative h-72 md:h-[500px] w-full overflow-hidden bg-black">
+                          <div className="relative h-56 md:h-72 lg:h-96 w-full overflow-hidden bg-black max-w-7xl mx-auto">
                              <Player
                                url={item.videoUrl}
                                controls
@@ -904,7 +906,7 @@ function App() {
                              />
                           </div>
                         ) : item.imageUrl ? (
-                          <div className="relative h-72 md:h-[500px] w-full overflow-hidden bg-slate-800">
+                          <div className="relative h-56 md:h-72 lg:h-96 w-full overflow-hidden bg-slate-800">
                             <img 
                               src={item.imageUrl} 
                               alt="" 
@@ -913,7 +915,7 @@ function App() {
                             <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] to-transparent opacity-80" />
                           </div>
                         ) : null}
-                        <div className="p-6 md:p-8 relative">
+                        <div className="p-5 md:p-8 relative max-w-7xl mx-auto">
                           <div className="mb-4">
                             <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-[#1e293b] bg-emerald-400 px-4 py-2 rounded-full shadow-lg shadow-emerald-500/20">
                               Admin Update
@@ -942,19 +944,19 @@ function App() {
                     return (
                       <div 
                         key={`api-${i}`} 
-                        className="block bg-[#1e293b] rounded-[2rem] overflow-hidden border border-slate-700/50 hover:border-emerald-500/50 transition-all hover:shadow-xl hover:shadow-emerald-500/10 group pb-4"
+                        className="block bg-[#0f172a] border-y border-slate-700/50 hover:border-emerald-500/50 transition-all hover:bg-[#1e293b] group pb-4 w-full"
                       >
                         {item.images?.[0]?.url && (
-                          <div className="relative h-72 md:h-[500px] overflow-hidden bg-slate-800">
+                          <div className="relative h-56 md:h-72 lg:h-96 overflow-hidden bg-slate-800">
                             <img 
                               src={item.images[0].url} 
                               alt="" 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                             />
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#1e293b] to-transparent opacity-80" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] group-hover:from-[#1e293b] to-transparent opacity-80 transition-colors" />
                           </div>
                         )}
-                        <div className="p-6 md:p-8 relative">
+                        <div className="p-5 md:p-8 relative max-w-7xl mx-auto">
                           <div className="mb-4 flex gap-3">
                             <span className="text-[10px] md:text-sm font-black uppercase tracking-widest text-emerald-400 bg-emerald-500/10 px-4 py-2 rounded-full border border-emerald-500/20">
                               Football
@@ -987,7 +989,7 @@ function App() {
             </div>
             )}
             
-            <div className="mt-12 pt-10 border-t border-slate-700/50 w-full">
+            <div className="mt-12 pt-10 border-t border-slate-700/50 w-full px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
               <div className="text-center mb-10">
                 <h2 className="text-2xl md:text-3xl font-black text-white mb-4 italic tracking-tight">Our Growing Community</h2>
                 <p className="text-slate-400 text-sm md:text-base max-w-2xl mx-auto">
@@ -1015,7 +1017,7 @@ function App() {
             </div>
           </div>
         ) : activeTab === 'profile' ? (
-          <div className="space-y-6 max-w-xl mx-auto">
+          <div className="space-y-6 max-w-xl mx-auto px-4 md:px-6 lg:px-8">
             <h2 className="text-lg font-bold text-white flex items-center gap-2">
               <UserCircle className="w-5 h-5 text-emerald-400" />
               Your Profile
@@ -1074,7 +1076,7 @@ function App() {
         ) : activeTab === 'contact' ? (
           <ContactUs />
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-6 px-4 md:px-6 lg:px-8 max-w-7xl mx-auto">
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-lg font-bold text-white flex items-center gap-2">

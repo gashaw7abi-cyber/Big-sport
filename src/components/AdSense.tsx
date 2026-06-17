@@ -18,19 +18,25 @@ export const AdSense: React.FC<AdSenseProps> = ({
   const isLoaded = useRef(false);
 
   useEffect(() => {
+    let timer: any;
     if (!isLoaded.current) {
-      try {
-        // @ts-ignore
-        (window.adsbygoogle = window.adsbygoogle || []).push({});
-        isLoaded.current = true;
-      } catch (err: any) {
-        // Ignore the expected error when strict mode renders twice
-        const errorMessage = typeof err === 'string' ? err : err instanceof Error ? err.message : String(err);
-        if (!errorMessage.includes('already have ads') && !errorMessage.includes('availableWidth=0')) {
-          console.error("AdSense error:", err);
+      timer = setTimeout(() => {
+        try {
+          // @ts-ignore
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          isLoaded.current = true;
+        } catch (err: any) {
+          // Ignore the expected error when strict mode renders twice
+          const errorMessage = typeof err === 'string' ? err : err instanceof Error ? err.message : String(err);
+          if (!errorMessage.includes('already have ads') && !errorMessage.includes('availableWidth=0')) {
+            console.error("AdSense error:", err);
+          }
         }
-      }
+      }, 200);
     }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, []);
 
   return (
