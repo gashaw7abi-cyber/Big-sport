@@ -588,7 +588,7 @@ function App() {
           <div className="flex items-center gap-2">
 
             {isAdmin && (
-              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full hidden sm:flex" title="Total Visitors">
+              <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full" title="Total Visitors">
                 <Users className="w-3.5 h-3.5 text-emerald-400" />
                 <span className="text-xs font-bold text-emerald-400">{activeUsersCount}</span>
               </div>
