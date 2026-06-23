@@ -3,6 +3,13 @@ import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
 import './index.css';
 
+window.onerror = function(message) {
+  if (typeof message === 'string' && (message.includes('Script error') || message === 'Script error.')) {
+    return true; // suppresses the error
+  }
+  return false;
+};
+
 window.addEventListener('unhandledrejection', (event) => {
   if (event.reason && event.reason.name === 'AbortError') {
     event.preventDefault();
@@ -19,7 +26,7 @@ window.addEventListener('error', (event) => {
   if (event.error && typeof event.error.message === 'string' && event.error.message.includes('aborted a request')) {
     event.preventDefault();
   }
-  if (event.message && typeof event.message === 'string' && event.message.includes('aborted a request')) {
+  if (event.message && typeof event.message === 'string' && (event.message.includes('aborted a request') || event.message === 'Script error.' || event.message.includes('Script error'))) {
     event.preventDefault();
   }
 });
@@ -85,7 +92,8 @@ console.error = (...args) => {
     msg.includes('aborted a request') || 
     msg.includes('AbortError') || 
     msg.includes('Failed to fetch') ||
-    msg.includes('Could not reach Cloud Firestore backend')
+    msg.includes('Could not reach Cloud Firestore backend') ||
+    msg.includes('Script error')
   ) {
     return;
   }
@@ -104,7 +112,8 @@ console.warn = (...args) => {
     msg.includes('aborted a request') || 
     msg.includes('AbortError') || 
     msg.includes('Failed to fetch') ||
-    msg.includes('Could not reach Cloud Firestore backend')
+    msg.includes('Could not reach Cloud Firestore backend') ||
+    msg.includes('Script error')
   ) {
     return;
   }
@@ -120,7 +129,7 @@ window.addEventListener('unhandledrejection', (event) => {
 
 window.addEventListener('error', (event) => {
   const msg = event.message || '';
-  if (msg.includes('aborted a request') || msg.includes('AbortError') || msg.includes('Failed to fetch')) {
+  if (msg.includes('aborted a request') || msg.includes('AbortError') || msg.includes('Failed to fetch') || msg === 'Script error.' || msg.includes('Script error')) {
     event.preventDefault();
   }
 });

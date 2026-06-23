@@ -17,6 +17,14 @@
     <link rel="apple-touch-icon" href="/icon-192x192.png" />
     <link rel="manifest" href="/manifest.json" />
     <title>NEW SPORT</title>
+    <script>
+      window.addEventListener('error', function(event) {
+        if (event.message === 'Script error.' || (event.message && event.message.includes('Script error'))) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      }, true);
+    </script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1052173421990358" crossorigin="anonymous"></script>
     <style>
