@@ -5,9 +5,46 @@ interface FooterProps {
   changeTab: (tab: 'news' | 'scores' | 'admin' | 'profile' | 'privacy' | 'about' | 'contact') => void;
 }
 
+const leagues = [
+  { name: 'Premier League', image: 'https://media.api-sports.io/football/leagues/39.png' },
+  { name: 'La Liga', image: 'https://media.api-sports.io/football/leagues/140.png' },
+  { name: 'Serie A', image: 'https://media.api-sports.io/football/leagues/135.png' },
+  { name: 'Bundesliga', image: 'https://media.api-sports.io/football/leagues/78.png' },
+  { name: 'Ligue 1', image: 'https://media.api-sports.io/football/leagues/61.png' },
+  { name: 'Champions League', image: 'https://media.api-sports.io/football/leagues/2.png' },
+  { name: 'Europa League', image: 'https://media.api-sports.io/football/leagues/3.png' },
+  { name: 'World Cup', image: 'https://media.api-sports.io/football/leagues/1.png' },
+];
+
 export const Footer: React.FC<FooterProps> = ({ changeTab }) => {
   return (
-    <footer className="mt-16 pt-10 pb-8 text-center md:text-left text-slate-400 border-t border-slate-700/50 bg-[#0f172a]/50">
+    <footer className="mt-16 pt-10 pb-8 text-center md:text-left text-slate-400 border-t border-slate-700/50 bg-[#0f172a]/50 overflow-hidden">
+      
+      {/* Auto-scrolling League Logos */}
+      <div className="w-full border-b border-slate-700/50 pb-8 mb-10 overflow-hidden relative">
+        <div className="absolute left-0 top-0 bottom-0 w-16 bg-gradient-to-r from-[#0f172a] to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-16 bg-gradient-to-l from-[#0f172a] to-transparent z-10 pointer-events-none"></div>
+        
+        <div className="flex w-max animate-marquee gap-12 items-center">
+          {/* Duplicate the list twice for seamless infinite scrolling */}
+          {[...leagues, ...leagues, ...leagues, ...leagues].map((league, index) => (
+            <div key={index} className="flex flex-col items-center gap-3 group opacity-90 hover:opacity-100 transition-opacity w-28">
+              <div className="bg-white p-3 rounded-xl border border-slate-700/50 group-hover:border-emerald-500/50 transition-colors shadow-sm">
+                <img 
+                  src={league.image} 
+                  alt={league.name} 
+                  className="w-14 h-14 object-contain transition-transform duration-300 group-hover:scale-110"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 group-hover:text-emerald-400 transition-colors whitespace-nowrap">
+                {league.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-8 mb-10">
           
