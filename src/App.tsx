@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Newspaper, ChevronRight, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube, Menu, X, MessageSquare } from 'lucide-react';
+import { Trophy, Newspaper, ChevronRight, ChevronLeft, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube, Menu, X, MessageSquare } from 'lucide-react';
 import { auth, db, storage, getMessagingInstance } from './firebase';
 import { fetchEspnNews, fetchEspnScores, fetchEspnSummary } from './api';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User, updateProfile } from 'firebase/auth';
@@ -12,6 +12,9 @@ import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { AboutUs } from './components/AboutUs';
 import { ContactUs } from './components/ContactUs';
 import { Footer } from './components/Footer';
+import { LineupsTab } from './components/LineupsTab';
+import { PreviewTab } from './components/PreviewTab';
+import { StandingsTab } from './components/StandingsTab';
 const Player = ReactPlayer as any;
 
 // Error Handler helper
@@ -100,6 +103,7 @@ function App() {
   const [customNews, setCustomNews] = useState<any[]>([]);
   const [scores, setScores] = useState<any[]>([]);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [activeMatchTab, setActiveMatchTab] = useState<'PREVIEW' | 'STATS' | 'LINEUPS' | 'STANDINGS'>('STATS');
   const [matchSummaries, setMatchSummaries] = useState<Record<string, any>>({});
   const [matchSummariesLoading, setMatchSummariesLoading] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
@@ -905,10 +909,10 @@ function App() {
                                height="100%"
                              />
                           </div>
-                        ) : item.imageUrl ? (
+                        ) : item.imageUrl && item.imageUrl.trim() !== '' ? (
                           <div className="relative h-56 md:h-72 lg:h-96 w-full overflow-hidden bg-slate-800">
                             <img 
-                              src={item.imageUrl} 
+                              src={item.imageUrl || undefined} 
                               alt="" 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                             />
@@ -946,10 +950,10 @@ function App() {
                         key={`api-${i}`} 
                         className="block bg-[#0f172a] border-y border-slate-700/50 hover:border-emerald-500/50 transition-all hover:bg-[#1e293b] group pb-4 w-full"
                       >
-                        {item.images?.[0]?.url && (
+                        {item.images?.[0]?.url && item.images[0].url.trim() !== '' && (
                           <div className="relative h-56 md:h-72 lg:h-96 overflow-hidden bg-slate-800">
                             <img 
-                              src={item.images[0].url} 
+                              src={item.images[0].url || undefined} 
                               alt="" 
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                             />
@@ -1136,11 +1140,13 @@ function App() {
                 const matchState = match.status?.type?.state; // 'pre', 'in', 'post'
                 const matchId = match.id;
                 const isExpanded = expandedMatchId === matchId;
+                const isPre = matchState === 'pre';
                 const toggleExpand = async () => {
                   if (isExpanded) {
                     setExpandedMatchId(null);
                   } else {
                     setExpandedMatchId(matchId);
+                    setActiveMatchTab(isPre ? 'PREVIEW' : 'STATS');
                     if (!matchSummaries[matchId] && !matchSummariesLoading[matchId] && match._league) {
                       setMatchSummariesLoading(prev => ({ ...prev, [matchId]: true }));
                       try {
@@ -1156,7 +1162,6 @@ function App() {
                 };
 
                 const isLive = matchState === 'in';
-                const isPre = matchState === 'pre';
                 const displayStatus = isLive ? `LIVE ${match.status?.displayClock ? `- ${match.status.displayClock}` : ''}` : status;
                 
                 const summaryData = matchSummaries[matchId];
@@ -1205,11 +1210,23 @@ function App() {
                 };
 
                 return (
-                  <div key={i} onClick={toggleExpand} className="bg-[#1e293b] rounded-3xl p-5 border border-slate-700/50 shadow-lg relative overflow-hidden cursor-pointer transition-colors hover:bg-slate-800">
-                    {/* Live indicator glow */}
-                    {isLive && (
-                      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,1)]" />
+                  <div key={i} onClick={!isExpanded ? toggleExpand : undefined} className={isExpanded ? "fixed inset-0 z-50 bg-[#0f172a] overflow-y-auto w-full h-full animate-in slide-in-from-right duration-300 flex flex-col" : "bg-[#1e293b] rounded-3xl p-5 border border-slate-700/50 shadow-lg relative overflow-hidden cursor-pointer transition-colors hover:bg-slate-800"}>
+                    
+                    {isExpanded && (
+                      <div className="sticky top-0 left-0 right-0 bg-[#0f172a]/90 backdrop-blur-md px-4 py-4 flex items-center justify-between z-10 border-b border-slate-800 shadow-sm">
+                        <button onClick={(e) => { e.stopPropagation(); toggleExpand(); }} className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors bg-slate-800 hover:bg-slate-700 px-4 py-2 rounded-full shadow-lg">
+                          <ChevronLeft className="w-5 h-5" />
+                          <span className="font-bold text-sm uppercase tracking-wider">Back</span>
+                        </button>
+                      </div>
                     )}
+
+                    <div className={isExpanded ? "max-w-2xl w-full mx-auto p-4 md:p-8 flex-1 pt-6 pb-24" : ""}>
+                      <div className={isExpanded ? "bg-[#1e293b] rounded-3xl p-5 md:p-8 border border-slate-700/50 shadow-lg relative overflow-hidden mb-8" : ""}>
+                      {/* Live indicator glow */}
+                      {isLive && (
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,1)]" />
+                      )}
 
                     <div className="flex justify-between items-center mb-6">
                       <div className="flex items-center gap-2">
@@ -1226,46 +1243,62 @@ function App() {
                       </span>
                     </div>
                     
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-center w-full max-w-lg mx-auto">
                       {/* Home Team */}
-                      <div className="flex flex-col items-center flex-1 w-1/3">
-                        <div className="w-14 h-14 bg-white rounded-2xl p-2 mb-3 shadow-md flex items-center justify-center">
-                          <img src={homeTeam.team.logo} alt={homeTeam.team.name} className="w-full h-full object-contain" />
+                      <div className="flex items-center justify-end flex-1 gap-2 md:gap-3 text-right">
+                        <span className="text-xs md:text-sm font-bold text-white leading-tight line-clamp-2 hidden sm:block">{homeTeam.team.shortDisplayName}</span>
+                        <span className="text-xs md:text-sm font-bold text-white leading-tight sm:hidden">{homeTeam.team.abbreviation || homeTeam.team.shortDisplayName.substring(0,3).toUpperCase()}</span>
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0">
+                          {homeTeam.team.logo ? <img src={homeTeam.team.logo} alt={homeTeam.team.name} className="w-full h-full object-contain" /> : <div className="w-full h-full bg-slate-200 rounded-full" />}
                         </div>
-                        <span className="text-xs font-bold text-center text-white leading-tight">{homeTeam.team.shortDisplayName}</span>
                       </div>
                       
                       {/* Score Display */}
-                      <div className="flex flex-col items-center justify-center px-4 w-1/3">
+                      <div className="flex flex-col items-center justify-center px-3 md:px-4 shrink-0 min-w-[80px]">
                         {isPre ? (
-                          <div className="flex flex-col items-center justify-center">
-                            <span className="text-xl font-bold text-white mb-1">vs</span>
-                            <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-md">
+                          <div className="flex flex-col items-center justify-center bg-slate-800/50 px-2 md:px-3 py-1.5 rounded-lg border border-slate-700/50">
+                            <span className="text-[11px] md:text-xs font-bold text-emerald-400 whitespace-nowrap">
                               {new Date(match.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </span>
                           </div>
                         ) : (
-                          <div className="text-4xl font-black text-white tracking-tighter flex items-center gap-3">
+                          <div className="text-xl md:text-2xl font-black text-white tracking-tighter flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700/50 shadow-inner">
                             <span className={homeTeam.winner ? 'text-emerald-400' : ''}>{homeTeam.score || '0'}</span>
-                            <span className="text-slate-600 font-normal opacity-50">-</span>
+                            <span className="text-slate-500 font-normal text-sm">-</span>
                             <span className={awayTeam.winner ? 'text-emerald-400' : ''}>{awayTeam.score || '0'}</span>
                           </div>
                         )}
                       </div>
 
                       {/* Away Team */}
-                      <div className="flex flex-col items-center flex-1 w-1/3">
-                        <div className="w-14 h-14 bg-white rounded-2xl p-2 mb-3 shadow-md flex items-center justify-center">
-                          <img src={awayTeam.team.logo} alt={awayTeam.team.name} className="w-full h-full object-contain" />
+                      <div className="flex items-center justify-start flex-1 gap-2 md:gap-3 text-left">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0">
+                          {awayTeam.team.logo ? <img src={awayTeam.team.logo} alt={awayTeam.team.name} className="w-full h-full object-contain" /> : <div className="w-full h-full bg-slate-200 rounded-full" />}
                         </div>
-                        <span className="text-xs font-bold text-center text-white leading-tight">{awayTeam.team.shortDisplayName}</span>
+                        <span className="text-xs md:text-sm font-bold text-white leading-tight line-clamp-2 hidden sm:block">{awayTeam.team.shortDisplayName}</span>
+                        <span className="text-xs md:text-sm font-bold text-white leading-tight sm:hidden">{awayTeam.team.abbreviation || awayTeam.team.shortDisplayName.substring(0,3).toUpperCase()}</span>
                       </div>
                     </div>
+                  </div>
+                    {isExpanded && (
+                      <div className="mt-6 pt-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                        {/* Tabs Navigation */}
+                        <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-4 scrollbar-hide border-b border-slate-700/50">
+                          {['PREVIEW', 'STATS', 'LINEUPS', 'STANDINGS'].map((tab) => (
+                             <button 
+                               key={tab} 
+                               onClick={(e) => { e.stopPropagation(); setActiveMatchTab(tab as any); }}
+                               className={`px-4 py-2 text-[10px] md:text-xs font-bold uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors ${activeMatchTab === tab ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-500 hover:text-slate-300'}`}
+                             >
+                               {tab}
+                             </button>
+                          ))}
+                        </div>
 
-                    {isExpanded && !isPre && (
-                      <div className="mt-6 pt-4 border-t border-slate-700/50 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                        {/* Stats */}
-                        {(homePossession || awayPossession || homeTotalShots > 0 || awayTotalShots > 0) && (
+                        {/* STATS TAB */}
+                        {activeMatchTab === 'STATS' && !isPre && (
+                          <div className="space-y-6">
+                            {(homePossession || awayPossession || homeTotalShots > 0 || awayTotalShots > 0) && (
                           <div className="space-y-4 mb-4">
                             {/* Possession */}
                             {(homePossession || awayPossession) && (
@@ -1432,8 +1465,30 @@ function App() {
                             </div>
                           );
                         })()}
+                          </div>
+                        )}
+
+                        {/* LINEUPS TAB */}
+                        {activeMatchTab === 'LINEUPS' && (
+                          <div className="space-y-6 pt-4">
+                            <LineupsTab summaryData={summaryData} homeTeam={homeTeam} awayTeam={awayTeam} />
+                          </div>
+                        )}
+
+                        {/* STANDINGS TAB */}
+                        {activeMatchTab === 'STANDINGS' && (
+                          <div className="space-y-6 pt-4">
+                            <StandingsTab summaryData={summaryData} homeTeam={homeTeam} awayTeam={awayTeam} />
+                          </div>
+                        )}
+
+                        {/* PREVIEW TAB */}
+                        {activeMatchTab === 'PREVIEW' && (
+                          <PreviewTab summaryData={summaryData} homeTeam={homeTeam} awayTeam={awayTeam} />
+                        )}
                       </div>
                     )}
+                    </div>
                   </div>
                 );
               })}

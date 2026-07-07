@@ -1,0 +1,68 @@
+                        {/* LINEUPS TAB */}
+                        {activeMatchTab === 'LINEUPS' && (
+                          <div className="space-y-6">
+                            {summaryData?.rosters ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                                {/* Home Lineup */}
+                                <div>
+                                  <div className="flex items-center gap-3 mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+                                    <div className="w-8 h-8 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0">
+                                      {homeTeam.team.logo ? <img src={homeTeam.team.logo} alt={homeTeam.team.name} className="w-full h-full object-contain" /> : <div className="w-full h-full bg-slate-200 rounded-full" />}
+                                    </div>
+                                    <h4 className="text-sm font-bold text-white uppercase tracking-wider">{homeTeam.team.shortDisplayName} Lineup</h4>
+                                  </div>
+                                  <div className="space-y-2">
+                                    {summaryData.rosters.find((r: any) => r.team?.id === homeTeam.team?.id || r.team?.uid === homeTeam.team?.uid || summaryData.rosters.indexOf(r) === 0)?.roster?.map((player: any, pi: number) => (
+                                      <div key={pi} className={`flex items-center gap-3 p-3 rounded-lg border border-slate-700/30 ${player.starter ? 'bg-slate-800/80' : 'bg-slate-800/40 opacity-70'}`}>
+                                        <div className="w-6 text-center text-xs font-black text-slate-500">{player.jersey || '-'}</div>
+                                        <div className="flex-1">
+                                          <div className="text-xs font-bold text-slate-200 flex items-center gap-2">
+                                            {player.athlete?.displayName || player.athlete?.shortName}
+                                            {player.subbedIn && <span className="text-[10px] text-emerald-400 font-black tracking-tighter">⇅ IN</span>}
+                                            {player.subbedOut && <span className="text-[10px] text-red-400 font-black tracking-tighter">⇅ OUT</span>}
+                                          </div>
+                                          <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">{player.position?.name || 'Unknown'} {player.starter ? '' : '(Sub)'}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                                
+                                {/* Away Lineup */}
+                                <div>
+                                  <div className="flex items-center gap-3 mb-6 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+                                    <div className="w-8 h-8 bg-white rounded-full p-1 shadow-md flex items-center justify-center shrink-0">
+                                      {awayTeam.team.logo ? <img src={awayTeam.team.logo} alt={awayTeam.team.name} className="w-full h-full object-contain" /> : <div className="w-full h-full bg-slate-200 rounded-full" />}
+                                    </div>
+                                    <h4 className="text-sm font-bold text-white uppercase tracking-wider">{awayTeam.team.shortDisplayName} Lineup</h4>
+                                  </div>
+                                  <div className="space-y-2">
+                                    {summaryData.rosters.find((r: any) => r.team?.id === awayTeam.team?.id || r.team?.uid === awayTeam.team?.uid || summaryData.rosters.indexOf(r) === 1)?.roster?.map((player: any, pi: number) => (
+                                      <div key={pi} className={`flex items-center gap-3 p-3 rounded-lg border border-slate-700/30 ${player.starter ? 'bg-slate-800/80' : 'bg-slate-800/40 opacity-70'}`}>
+                                        <div className="w-6 text-center text-xs font-black text-slate-500">{player.jersey || '-'}</div>
+                                        <div className="flex-1">
+                                          <div className="text-xs font-bold text-slate-200 flex items-center gap-2">
+                                            {player.athlete?.displayName || player.athlete?.shortName}
+                                            {player.subbedIn && <span className="text-[10px] text-emerald-400 font-black tracking-tighter">⇅ IN</span>}
+                                            {player.subbedOut && <span className="text-[10px] text-red-400 font-black tracking-tighter">⇅ OUT</span>}
+                                          </div>
+                                          <div className="text-[10px] text-slate-500 font-medium uppercase tracking-wider mt-0.5">{player.position?.name || 'Unknown'} {player.starter ? '' : '(Sub)'}</div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="text-center text-xs text-slate-500 py-8">Lineups not available yet.</div>
+                            )}
+                          </div>
+                        )}
+
+                        {/* STANDINGS TAB */}
+                        {activeMatchTab === 'STANDINGS' && (
+                          <div className="space-y-6">
+                            {summaryData?.standings?.[0]?.groups?.[0]?.standings ? (
+                              <div className="overflow-x-auto rounded-xl border border-slate-700/50 bg-slate-800/50">
+                                <table className="w-full text-left text-xs whitespace-nowrap">
+                                  <thead className="bg-slate-800 text-slate-400 uppercase tracking-wider font-black text-[10px]">
