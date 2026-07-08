@@ -1,6 +1,6 @@
 export default async function handler(req: any, res: any) {
   try {
-    const leagues = ['eng.1', 'eng.2', 'esp.1', 'ita.1', 'ger.1', 'fra.1', 'uefa.champions', 'uefa.europa', 'uefa.europa.conf'];
+    const leagues = ['eng.1', 'eng.2', 'esp.1', 'ita.1', 'ger.1', 'fra.1', 'uefa.champions', 'uefa.europa', 'uefa.europa.conf', 'fifa.world', 'fifa.worldq'];
     let allArticles: any[] = [];
     
     await Promise.all(leagues.map(async (league) => {
