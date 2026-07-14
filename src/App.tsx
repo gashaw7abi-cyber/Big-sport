@@ -587,7 +587,7 @@ function App() {
               <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-slate-400 hover:text-white`}>
                 <MessageSquare className="w-4 h-4" /> Support
               </button>
-              <a href="/app.apk" download className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900`}>
+              <a href="https://www.dropbox.com/scl/fi/85ttb9tdcxtaru1k07cdm/app.apk?rlkey=qsoghuj5vll4sm3083m1ns29i&st=uf06fpel&dl=1" className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900`}>
                 <Download className="w-4 h-4" /> App
               </a>
             </nav>
@@ -677,8 +677,7 @@ function App() {
               <span className="text-lg font-bold">Contact Us</span>
             </button>
             <a 
-              href="/app.apk" 
-              download 
+              href="https://www.dropbox.com/scl/fi/85ttb9tdcxtaru1k07cdm/app.apk?rlkey=qsoghuj5vll4sm3083m1ns29i&st=uf06fpel&dl=1" 
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-4 rounded-2xl flex items-center gap-4 transition-all bg-emerald-500 text-slate-900 hover:bg-emerald-400"
             >
