@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Trophy, Newspaper, ChevronRight, ChevronLeft, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube, Menu, X, MessageSquare } from 'lucide-react';
+import { Trophy, Newspaper, ChevronRight, ChevronLeft, Lock, Plus, Trash2, LogOut, Upload, Users, Bell, BellOff, UserCircle, Save, Share2, Send, Bot, Facebook, Instagram, Twitter, Youtube, Menu, X, MessageSquare, Download } from 'lucide-react';
 import { auth, db, storage, getMessagingInstance } from './firebase';
 import { fetchEspnNews, fetchEspnScores, fetchEspnSummary } from './api';
 import { signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, User, updateProfile } from 'firebase/auth';
@@ -587,6 +587,9 @@ function App() {
               <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-slate-400 hover:text-white`}>
                 <MessageSquare className="w-4 h-4" /> Support
               </button>
+              <a href="/app.apk" download className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900`}>
+                <Download className="w-4 h-4" /> App
+              </a>
             </nav>
           </div>
           <div className="flex items-center gap-2">
@@ -673,6 +676,15 @@ function App() {
               <MessageSquare className="w-6 h-6" /> 
               <span className="text-lg font-bold">Contact Us</span>
             </button>
+            <a 
+              href="/app.apk" 
+              download 
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="p-4 rounded-2xl flex items-center gap-4 transition-all bg-emerald-500 text-slate-900 hover:bg-emerald-400"
+            >
+              <Download className="w-6 h-6" /> 
+              <span className="text-lg font-bold">Download App</span>
+            </a>
           </nav>
 
           <div className="mt-8 border-t border-slate-700/50 pt-8 flex flex-col gap-4">
