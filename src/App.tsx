@@ -132,6 +132,8 @@ function App() {
   const [pushEnabled, setPushEnabled] = useState(false);
   const [fcmToken, setFcmToken] = useState<string | null>(null);
 
+  const APK_DOWNLOAD_URL = "https://www.dropbox.com/scl/fi/1gwq668ipl3yzzlxwze37/app.apk?rlkey=8i62hq8dutwtnzwns0k19xacf&st=8gx8wgvd&dl=1";
+
   useEffect(() => {
     // Check if permission is already granted
     try {
@@ -562,6 +564,32 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] text-slate-200 font-sans pb-24 md:pb-0">
+      {/* Top Persistent App Promotion Notice Banner */}
+      <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-slate-950 px-3 py-2 shadow-md flex items-center justify-between gap-3 text-xs overflow-hidden relative">
+        <div className="flex items-center flex-1 min-w-0 overflow-hidden relative">
+          <div className="w-6 h-6 rounded-lg bg-slate-950 p-0.5 flex-shrink-0 z-10 mr-2 shadow-[2px_0_10px_rgba(4,120,87,0.5)]">
+            <img src="https://i.postimg.cc/g29Gpg7r/1778746810882.jpg" alt="NEW SPORT" className="w-full h-full object-cover rounded-md" />
+          </div>
+          <div className="flex-1 overflow-hidden whitespace-nowrap mask-image-fade">
+             <div className="inline-block animate-marquee pl-4">
+                <span className="font-bold text-white tracking-wide mr-8">
+                  <strong className="font-black uppercase tracking-wider text-slate-950">NEW SPORT Android App:</strong> ቀጥታ አፑን አውርደው የቀጥታ ውጤቶችን እና ዜናዎችን በፍጥነት ይከታተሉ!
+                </span>
+                <span className="font-bold text-white tracking-wide mr-8">
+                  <strong className="font-black uppercase tracking-wider text-slate-950">NEW SPORT Android App:</strong> ቀጥታ አፑን አውርደው የቀጥታ ውጤቶችን እና ዜናዎችን በፍጥነት ይከታተሉ!
+                </span>
+             </div>
+          </div>
+        </div>
+        <a
+          href={APK_DOWNLOAD_URL}
+          className="bg-slate-950 hover:bg-slate-900 text-emerald-400 px-3 py-1.5 rounded-xl font-extrabold text-[10px] sm:text-xs flex items-center gap-1.5 transition-all flex-shrink-0 shadow border border-emerald-400/30 relative z-10"
+        >
+          <Download className="w-3.5 h-3.5 text-emerald-400 animate-bounce" />
+          <span>APK አውርድ</span>
+        </a>
+      </div>
+
       {/* Header */}
       <header className="bg-[#1e293b] border-b border-slate-700/50 sticky top-0 z-50 shadow-lg">
         <div className="px-5 py-4 max-w-7xl mx-auto flex items-center justify-between">
@@ -587,7 +615,7 @@ function App() {
               <button onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 text-slate-400 hover:text-white`}>
                 <MessageSquare className="w-4 h-4" /> Support
               </button>
-              <a href="https://www.dropbox.com/scl/fi/85ttb9tdcxtaru1k07cdm/app.apk?rlkey=qsoghuj5vll4sm3083m1ns29i&st=uf06fpel&dl=1" className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900`}>
+              <a href="https://www.dropbox.com/scl/fi/1gwq668ipl3yzzlxwze37/app.apk?rlkey=8i62hq8dutwtnzwns0k19xacf&st=8gx8wgvd&dl=1" className={`px-4 py-2 rounded-xl text-sm font-bold transition-all flex items-center gap-2 bg-emerald-500 hover:bg-emerald-400 text-slate-900`}>
                 <Download className="w-4 h-4" /> App
               </a>
             </nav>
@@ -677,7 +705,7 @@ function App() {
               <span className="text-lg font-bold">Contact Us</span>
             </button>
             <a 
-              href="https://www.dropbox.com/scl/fi/85ttb9tdcxtaru1k07cdm/app.apk?rlkey=qsoghuj5vll4sm3083m1ns29i&st=uf06fpel&dl=1" 
+              href="https://www.dropbox.com/scl/fi/1gwq668ipl3yzzlxwze37/app.apk?rlkey=8i62hq8dutwtnzwns0k19xacf&st=8gx8wgvd&dl=1" 
               onClick={() => setIsMobileMenuOpen(false)}
               className="p-4 rounded-2xl flex items-center gap-4 transition-all bg-emerald-500 text-slate-900 hover:bg-emerald-400"
             >
